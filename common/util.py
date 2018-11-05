@@ -9,7 +9,7 @@ from common.np import *
 
 def preprocess(text):
     lowered_text = text.lower()
-    words = [word for word in re.split('(\W+)?', text) if word not in [' ', '']]
+    words = [word for word in re.split('(\W)+?', text) if word not in [' ', '']]
 
     word_to_id = {}
     id_to_word = {}
