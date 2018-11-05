@@ -25,29 +25,6 @@ def preprocess(text):
     return corpus, word_to_id, id_to_word
 
 
-def create_co_matrix(corpus, vocabulary_size, window_size=1):
-    """
-    Creates co-occurrence matrix.
-    """
-    corpus_size = len(corpus)
-    co_matrix = np.zeros((vocabulary_size, vocabulary_size), dtype=np.int32)
-
-    for idx, word_id in enumerate(corpus):
-        for i in range(1, window_size + 1):
-            left_idx = idx - 1
-            right_idx = idx + 1
-
-            if left_idx >= 0:
-                left_word_id = corpus[left_idx]
-                co_matrix[word_id, left_word_id] += 1
-
-            if right_idx < corpus_size:
-                right_word_id = corpus[right_idx]
-                co_matrix[word_id, right_word_id] += 1
-
-    return co_matrix
-
-
 def cos_similarity(x, y, eps=1e-8):
     nx = x / np.sqrt(np.sum(x ** 2)) + eps
     ny = y / np.sqrt(np.sum(y ** 2)) + eps
@@ -91,6 +68,29 @@ def most_similar(query, word_to_id, id_to_word, word_matrix, top=5):
             return
 
 
+def create_co_matrix(corpus, vocabulary_size, window_size=1):
+    """
+    Creates co-occurrence matrix.
+    """
+    corpus_size = len(corpus)
+    co_matrix = np.zeros((vocabulary_size, vocabulary_size), dtype=np.int32)
+
+    for idx, word_id in enumerate(corpus):
+        for i in range(1, window_size + 1):
+            left_idx = idx - i
+            right_idx = idx + i
+
+            if left_idx >= 0:
+                left_word_id = corpus[left_idx]
+                co_matrix[word_id, left_word_id] += 1
+
+            if right_idx < corpus_size:
+                right_word_id = corpus[right_idx]
+                co_matrix[word_id, right_word_id] += 1
+
+    return co_matrix
+
+
 def ppmi(C, verbose=False, eps=1e-8):
     """
     Convert from co-occurrence matrix to PPMI matrix.
@@ -113,7 +113,9 @@ def ppmi(C, verbose=False, eps=1e-8):
 
             if verbose:
                 count += 1
-                if count % (total / 100) == 0:
+                if count % (total // 100) == 0:
                     print('%.1f%% done' % (100 * count / total))
 
     return M
+
+
