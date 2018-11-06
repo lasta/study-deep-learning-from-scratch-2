@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 matplotlib = "==3.0.1"
 sklearn = "*"
+pylint = "*"
 
 [dev-packages]
 
