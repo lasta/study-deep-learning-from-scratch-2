@@ -8,6 +8,19 @@ from common.np import *
 
 
 def preprocess(text):
+    """
+    Preprocessor for text to do deep learning.
+
+    >>> text = 'You say goodbye and I say hello.'
+    >>> corpus, word_to_id, id_to_word = preprocess(text)
+    >>> corpus
+    array([0, 1, 2, 3, 4, 1, 5, 6])
+    >>> word_to_id
+    {'You': 0, 'say': 1, 'goodbye': 2, 'and': 3, 'I': 4, 'hello': 5, '.': 6}
+    >>> id_to_word
+    {0: 'You', 1: 'say', 2: 'goodbye', 3: 'and', 4: 'I', 5: 'hello', 6: '.'}
+    """
+
     lowered_text = text.lower()
     words = [word for word in re.split('(\W)+?', text) if word not in [' ', '']]
 
@@ -26,6 +39,10 @@ def preprocess(text):
 
 
 def cos_similarity(x, y, eps=1e-8):
+    """
+    Calculates cosine similarity.
+    TODO: add doctest
+    """
     nx = x / np.sqrt(np.sum(x ** 2)) + eps
     ny = y / np.sqrt(np.sum(y ** 2)) + eps
     return np.dot(nx, ny)
@@ -33,13 +50,14 @@ def cos_similarity(x, y, eps=1e-8):
 
 def most_similar(query, word_to_id, id_to_word, word_matrix, top=5):
     """
-    Calculate most similar words with query
-    @param query query
-    @param word_to_id dictionary from word to word id
-    @param id_to_word dictionary from word id to word
-    @param word_matrix matrix that word vectors joined to.
-    @param top number how many returns
-    @return words that simlar to query 
+    Calculates most similar words with query.
+
+    :param query: query
+    :param word_to_id: dictionary from word to word id
+    :param id_to_word: dictionary from word id to word
+    :param word_matrix: matrix that word vectors joined to.
+    :param top: number how many returns
+    :return: words that simlar to query 
     """
     # extract query
     if query not in word_to_id:
@@ -97,8 +115,8 @@ def ppmi(C, verbose=False, eps=1e-8):
     PPMI : Pointwise Mutual Information (ja; 相互情報量)
     PMI(x, y) = log_2 (P(x, y) / ( P(x) P(y) ))
 
-    @param C co-occurrence matrix
-    @return PPMI matrix
+    :param C: co-occurrence matrix
+    :return PPMI: matrix
     """
     M = np.zeros_like(C, dtype=np.float32)
     N = np.sum(C)
@@ -118,4 +136,25 @@ def ppmi(C, verbose=False, eps=1e-8):
 
     return M
 
+
+def create_contexts_target(corpus, window_size=1):
+    """
+    Transport corpus to one-hot-vectors.
+
+    :param words: NumPy array of word ids
+    :param vocabulary_size: size of vocablary
+    :return: NumPy array that transported to one-hot-vectors.
+    """
+    target = corpus[window_size:-window_size]
+    contexts = []
+
+    for idx in range(window_size, len(corpus) - window_size):
+        cs = []
+        for t in range(-window_size, window_size + 1):
+            if t == 0:
+                continue
+            cs.append(corpus[idx + t])
+        contexts.append(cs)
+
+    return np.array(contexts), np.array(target)
 

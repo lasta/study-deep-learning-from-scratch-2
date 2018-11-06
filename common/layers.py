@@ -1,5 +1,5 @@
 # coding: utf-8
-from common.np improt * # includes import numpy as np
+from common.np import * # includes import numpy as np
 from common.config import GPU
 from common.functions import softmax, cross_entropy_error
 
@@ -105,7 +105,7 @@ class Sigmoid:
         return out
 
     def backword(self, dout):
-        return dout * (1.0 - self.out) * self.out)
+        return dout * (1.0 - self.out) * self.out
 
 
 class SigmoidWithLoss:
@@ -150,7 +150,7 @@ class Dropout:
         return dout * self.mask
 
 
-def Embedding:
+class Embedding:
     def __init__(self, W):
         self.params = [W]
         self.grads = [np.zeros_like(W)]
