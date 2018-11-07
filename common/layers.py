@@ -16,7 +16,7 @@ class MatMul:
         self.x = x
         return out
 
-    def backword(self, dout):
+    def backward(self, dout):
         W, = self.params
         dx = np.dot(dout, W.T)
         dW = np.dot(self.x.T, dout)
@@ -39,7 +39,7 @@ class Affine:
         self.x = x
         return out
 
-    def backword(self, dout):
+    def backward(self, dout):
         W, b = self.params
         dx = np.dot(dout, W.T)
         dW = np.dot(self.x.T, dout)
@@ -60,7 +60,7 @@ class Softmax:
         self.out = softmax(x)
         return self.out
 
-    def backword(self, dout):
+    def backward(self, dout):
         dx = self.out * dout
         sumdx = np.sum(dx, axis=1, keepdims=True)
         dx -= self.out * sumdx
@@ -83,7 +83,7 @@ class SoftmaxWithLoss:
         loss = cross_entropy_error(self.y, self.t)
         return loss
 
-    def backword(self, dout=1):
+    def backward(self, dout=1):
         batch_size = self.t.shape[0]
         
         dx = self.y.copy()
@@ -104,7 +104,7 @@ class Sigmoid:
         self.out = out
         return out
 
-    def backword(self, dout):
+    def backward(self, dout):
         return dout * (1.0 - self.out) * self.out
 
 
@@ -126,7 +126,7 @@ class SigmoidWithLoss:
 
         return self.loss
 
-    def backword(self, dout=1):
+    def backward(self, dout=1):
         batch_size = self.t.shape[0]
         return (self.y - self.t) * dout / batch_size
 
@@ -145,7 +145,7 @@ class Dropout:
         self.mask = np.random.rand(*x.shape) > self.dropout_ratio
         return x * self.mask
 
-    def backword(self, dout):
+    def backward(self, dout):
         return dout * self.mask
 
 
@@ -160,7 +160,7 @@ class Embedding:
         self.idx = idx
         return W[idx]
 
-    def backword(self, dout):
+    def backward(self, dout):
         dW, = self.grads
         dW[...] = 0
         np.add.at(dW, self.idx, dout)
