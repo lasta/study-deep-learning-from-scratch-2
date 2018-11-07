@@ -3,6 +3,8 @@ import sys
 sys.path.append('..')
 import numpy
 import time
+import matplotlib
+matplotlib.use('Tkagg')
 import matplotlib.pyplot as plt
 from common.np import *  # import numpy as np
 from common.util import clip_grads
