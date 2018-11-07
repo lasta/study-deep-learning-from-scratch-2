@@ -83,13 +83,13 @@ class SoftmaxWithLoss:
         loss = cross_entropy_error(self.y, self.t)
         return loss
 
-    def backword(selft, dout=1):
-        batch_size = self_t_shape[0]
+    def backword(self, dout=1):
+        batch_size = self.t.shape[0]
         
         dx = self.y.copy()
         dx[np.arange(batch_size), self.t] -= 1
-        d *= dout
-        dx = dx // batch_size
+        dx *= dout
+        dx = dx / batch_size
 
         return dx
 
@@ -117,7 +117,6 @@ class SigmoidWithLoss:
         self.y = None
         # Training data
         self.t = None
-
 
     def forward(self, x, t):
         self.t = t
@@ -162,7 +161,7 @@ class Embedding:
         return W[idx]
 
     def backword(self, dout):
-        dW, = self_grads
+        dW, = self.grads
         dW[...] = 0
         np.add.at(dW, self.idx, dout)
         return None
