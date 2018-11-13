@@ -1,8 +1,19 @@
 # -*- coding: utf-8 -*-
 import sys
 sys.path.append('..')
-from common.np import *
+from common.np import np
 
+
+class SGD:
+    """
+    Stochastic Gradient Descent (確率的均等降下法)
+    """
+    def __init__(self, lr=0.01):
+        self.lr = lr
+
+    def update(self, params, grads):
+        for param, grad in zip(params, grads):
+            param -= self.lr * grad
 
 class Adam:
     """
