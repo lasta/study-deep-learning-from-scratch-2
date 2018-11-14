@@ -7,6 +7,7 @@ name = "pypi"
 matplotlib = "==3.0.1"
 sklearn = "*"
 pylint = "*"
+keras = "*"
 
 [dev-packages]
 pylint = "*"
