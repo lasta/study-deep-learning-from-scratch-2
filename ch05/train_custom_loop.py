@@ -17,7 +17,7 @@ hidden_size = 100
 # time size for Truncated BPTT expansion
 time_size = 5
 lr = 0.1
-max_epoch = 100
+max_epoch = 500
 
 
 # load training data (reduce dataset size)
@@ -36,7 +36,7 @@ print(f"corpus size: {corpus_size}, vocabulary size: {vocabulary_size}.")
 # variables for training
 max_iters = data_size // (batch_size * time_size)
 time_idx = 0
-total_idx = 0
+total_loss = 0
 loss_count = 0
 ppl_list = []
 

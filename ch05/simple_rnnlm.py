@@ -34,7 +34,7 @@ class SimpleRnnlm:
             self.grads += layer.grads
     
     def forward(self, xs, ts):
-        for layer in layers:
+        for layer in self.layers:
             xs = layer.forward(xs)
         loss = self.loss_layer.forward(xs, ts)
         return loss
