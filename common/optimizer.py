@@ -15,6 +15,7 @@ class SGD:
         for param, grad in zip(params, grads):
             param -= self.lr * grad
 
+
 class Adam:
     """
     Adam (http://arxiv.org/abs/1412.6980v8)

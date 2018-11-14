@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 import sys
 sys.path.append('..')
 import matplotlib
@@ -45,7 +45,7 @@ model = SimpleRnnlm(vocabulary_size, wordvec_size, hidden_size)
 optimizer = SGD(lr)
 
 # calc position of start to read each mini-batch samples.
-jump = (corpus - 1) // batch_size
+jump = (corpus_size - 1) // batch_size
 offsets = [i * jump for i in range(batch_size)]
 
 for epoch in range(max_epoch):
@@ -58,7 +58,7 @@ for epoch in range(max_epoch):
                 batch_x[i, t] = xs[(offset + time_idx) % data_size]
                 batch_t[i, t] = ts[(offset + time_idx) % data_size]
             time_idx += 1
-    
+
         # calculate gradient and update parameters
         loss = model.forward(batch_x, batch_t)
         model.backward()
