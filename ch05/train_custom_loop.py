@@ -2,7 +2,7 @@
 import sys
 sys.path.append('..')
 import matplotlib
-matplotlib.use('WXAgg')
+matplotlib.use('Tkagg')
 import matplotlib.pyplot as plt
 import numpy as np
 from common.optimizer import SGD
@@ -31,7 +31,7 @@ xs = corpus[:-1]
 # output (training label)
 ts = corpus[1:]
 data_size = len(xs)
-print(f"corpus size: {corpus_size}, vocabulary size: {vocab_size}.")
+print(f"corpus size: {corpus_size}, vocabulary size: {vocabulary_size}.")
 
 # variables for training
 max_iters = data_size // (batch_size * time_size)
@@ -73,4 +73,9 @@ for epoch in range(max_epoch):
     total_loss, loss_count = 0, 0
 
 
-# TODO: グラフの描画
+# グラフの描画
+x = np.arange(len(ppl_list))
+plt.plot(x, ppl_list, label='train')
+plt.xlabel('epochs')
+plt.ylabel('perplexity')
+plt.show()

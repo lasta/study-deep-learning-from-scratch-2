@@ -133,7 +133,7 @@ class TimeEmbedding:
 
 class TimeAffine:
     def __init__(self, W, b):
-        self.params = [W, B]
+        self.params = [W, b]
         self.grads = [np.zeros_like(W), np.zeros_like(b)]
         self.x = None
     
