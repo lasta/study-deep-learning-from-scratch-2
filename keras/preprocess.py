@@ -52,14 +52,18 @@ def text_to_chars(text):
 
 def generate_npy(texts, char_to_id, output_file):
     """
-    >>> texts = ["IKEA港北", "IKEA新三郷", "IKEA立川"]
+    >>> texts = ["IKEA港北", "IKEA三郷", "IKEA立川"]
     >>> _, char_to_id, _ = preprocess(texts)
     >>> output_file = "/tmp/generate_npy.npy"
     >>> generate_npy(texts, char_to_id, output_file)
-    (3, 1)
+    array([[0, 1, 2, 3, 4, 5],
+           [0, 1, 2, 3, 6, 7],
+           [0, 1, 2, 3, 8, 9]])
     """
-    texts_vec = [np.array([char_to_id[char] for char in text]) for text in texts]
-    corpus = np.array(texts_vec).reshape(len(texts_vec), 1)
+    # TODO: text の長さが違っていてもできるようにする
+    # もしかしたら、np.arrayのpython.listでもよいのかもしれない
+    # corpus : [array([0, 1, 2, 3, 4, 5]), array([0, 1, 2, 3, 6, 7]), array([0, 1, 2, 3, 8, 9])]
+    texts_vec = [np.array([char_to_id[char] for char in text]).reshape(len(text)) for text in texts]
+    corpus = np.array(texts_vec)
     np.save(output_file, corpus)
-    print(corpus.shape)
-
+    return corpus
