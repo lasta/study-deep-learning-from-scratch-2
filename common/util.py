@@ -220,7 +220,7 @@ def clip_grads(grads, max_norm):
     rate = max_norm / (total_norm + 1e-6)
     if rate < 1:
         for grad in grads:
-            grrad *= rate
+            grad *= rate
 
 
 def analogy(a, b, c, word_to_id, id_to_word, word_matrix, top=5, answer=None):
