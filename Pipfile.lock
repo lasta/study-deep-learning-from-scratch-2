@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "0c0d015944f2f6708a3ee4c97fc2824f5eb5889d5c7b1d197efaba3cdd014064"
+            "sha256": "6b5a1e6b873a350cec641f30ed616de3ded03b1189149c259208556b9b6df5ed"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -29,6 +29,10 @@
                 "sha256:cd7b2d1018258d7247a71425e9f26463dfb444d411c39569972f4ce586b0c9d8"
             ],
             "version": "==0.10.0"
+        },
+        "fasttext": {
+            "editable": true,
+            "path": "/Users/atsushi-koshikizawa/repos/external/fastText"
         },
         "h5py": {
             "hashes": [
@@ -220,6 +224,13 @@
                 "sha256:edfa6fba9157e0e3be0f40168eb142511012683ac3dc82420bee4a3f3981b30e"
             ],
             "version": "==1.15.4"
+        },
+        "pybind11": {
+            "hashes": [
+                "sha256:642abbbd2948ed5af28e69adfae1535347c7aa9eb0cdab130e20e1f198f8e1cf",
+                "sha256:bd68159013d20c79bf79893b174a6ee7f74af740bf60ae731565f5d8d4094403"
+            ],
+            "version": "==2.2.4"
         },
         "pylint": {
             "hashes": [

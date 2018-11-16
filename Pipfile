@@ -8,6 +8,7 @@ matplotlib = "==3.0.1"
 sklearn = "*"
 pylint = "*"
 keras = "*"
+fasttext = {editable = true, path = "/Users/atsushi-koshikizawa/repos/external/fastText"}
 
 [dev-packages]
 pylint = "*"
