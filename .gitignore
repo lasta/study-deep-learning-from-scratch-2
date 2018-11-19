@@ -1,1 +1,4 @@
 keras/data/
+*.bin
+*.vec
+*.pkl
