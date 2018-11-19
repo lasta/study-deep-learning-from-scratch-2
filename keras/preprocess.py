@@ -15,27 +15,28 @@ def preprocess(texts, puts_padding=False, padding_char="\t"):
     >>> texts = ['IKEA港北', 'IKEA新三郷']
     >>> corpus, char_to_id, id_to_char = preprocess(texts)
     >>> corpus
-    array([0, 1, 2, 3, 6, 7, 8])
+    array([1, 2, 3, 4, 7, 8, 9])
     >>> char_to_id
-    {'I': 0, 'K': 1, 'E': 2, 'A': 3, '港': 4, '北': 5, '新': 6, '三': 7, '郷': 8}
+    {'\\t': 0, 'I': 1, 'K': 2, 'E': 3, 'A': 4, '港': 5, '北': 6, '新': 7, '三': 8, '郷': 9}
     >>> id_to_char
-    {0: 'I', 1: 'K', 2: 'E', 3: 'A', 4: '港', 5: '北', 6: '新', 7: '三', 8: '郷'}
+    {0: '\\t', 1: 'I', 2: 'K', 3: 'E', 4: 'A', 5: '港', 6: '北', 7: '新', 8: '三', 9: '郷'}
 
     >>> corpus, char_to_id, id_to_char = preprocess(texts, puts_padding=True)
     >>> corpus
-    array([0, 1, 2, 3, 7, 8, 9])
+    array([1, 2, 3, 4, 7, 8, 9])
     >>> char_to_id
-    {'I': 0, 'K': 1, 'E': 2, 'A': 3, '港': 4, '北': 5, '\\t': 6, '新': 7, '三': 8, '郷': 9}
+    {'\\t': 0, 'I': 1, 'K': 2, 'E': 3, 'A': 4, '港': 5, '北': 6, '新': 7, '三': 8, '郷': 9}
     >>> id_to_char
-    {0: 'I', 1: 'K', 2: 'E', 3: 'A', 4: '港', 5: '北', 6: '\\t', 7: '新', 8: '三', 9: '郷'}
+    {0: '\\t', 1: 'I', 2: 'K', 3: 'E', 4: 'A', 5: '港', 6: '北', 7: '新', 8: '三', 9: '郷'}
     """
     if puts_padding:
         max_text_len = calc_max_len(texts)
         texts = [put_padding(text, max_text_len, padding_char) for text in texts]
     chars_list = [text_to_chars(text) for text in texts]
 
-    char_to_id = {}
-    id_to_char = {}
+    # Initialize with padding char.
+    char_to_id = {padding_char: 0}
+    id_to_char = {0 : padding_char}
 
     for chars in chars_list:
         for char in chars:
@@ -97,6 +98,7 @@ def put_padding(text, max_length, filling_char="\t"):
 
 def text_to_vec(text, char_to_id):
     """
+    TODO: fastText を用いた分散表現を用いる
     Converts text to vector in corpus.
     When char in text is not in corpus, then raises KeyError.
 
@@ -119,38 +121,48 @@ def text_to_vec(text, char_to_id):
     return np.array([char_to_id[char] for char in chars])
 
 
-def convert_one_hot(corpus, vocabulary_size):
+def convert_one_hot(corpus, vocabulary_size, max_length):
     """
     Converts to one-hot vectors.
 
     :param corpus: list of word ids (dim 1 of numpy array)
     :param vocabulary_size: vocabulary size
     :return: one-hot vectors (dim 2 of numpy array)
-    >>> corpus = np.array([1, 2, 1])
+    >>> corpus = np.array([1, 2, 1, 0])
     >>> vocabulary_size = 5
-    >>> convert_one_hot(corpus, vocabulary_size)
+    >>> max_length = 10
+    >>> convert_one_hot(corpus, vocabulary_size, max_length)
     array([[0, 1, 0, 0, 0],
            [0, 0, 1, 0, 0],
-           [0, 1, 0, 0, 0]], dtype=int32)
+           [0, 1, 0, 0, 0],
+           [1, 0, 0, 0, 0],
+           [0, 0, 0, 0, 0],
+           [0, 0, 0, 0, 0],
+           [0, 0, 0, 0, 0],
+           [0, 0, 0, 0, 0],
+           [0, 0, 0, 0, 0],
+           [0, 0, 0, 0, 0]], dtype=int32)
 
-    >>> corpus = np.array([[1, 2, 1], [1, 2, 3]])
+    >>> corpus = np.array([[1, 2, 1, 0], [1, 2, 3, 0]])
     >>> vocabulary_size = 5
-    >>> convert_one_hot(corpus, vocabulary_size)
+    >>> max_length = 10
+    >>> convert_one_hot(corpus, vocabulary_size, max_length)
     Traceback (most recent call last):
         ...
     ValueError: Corpus must be dim 1, but actual is 2
 
     >>> corpus = np.array([1, 2, 6])
     >>> vocabulary_size = 5
-    >>> convert_one_hot(corpus, vocabulary_size)
+    >>> max_length = 10
+    >>> convert_one_hot(corpus, vocabulary_size, max_length)
     Traceback (most recent call last):
         ...
     IndexError: index 6 is out of bounds for axis 1 with size 5
     """
-    N = corpus.shape[0]
+    N = max_length
 
     if corpus.ndim != 1:
-        raise ValueError(f"Corpus must be dim 1, but actual is {corpus.ndim}")
+        raise ValueError("Corpus must be dim 1, but actual is %d" % corpus.ndim)
 
     one_hot = np.zeros((N, vocabulary_size), dtype=np.int32)
     for idx, word_id in enumerate(corpus):
@@ -159,15 +171,15 @@ def convert_one_hot(corpus, vocabulary_size):
     return one_hot
 
 
-def generate_npy(char_to_id, output_file):
+def generate_npy(texts, char_to_id, output_file):
     """
     >>> texts = ["IKEA港北", "IKEA三郷", "IKEA立川"]
     >>> _, char_to_id, _ = preprocess(texts)
     >>> output_file = "/tmp/generate_npy.npy"
     >>> generate_npy(texts, char_to_id, output_file)
-    array([[0, 1, 2, 3, 4, 5],
-           [0, 1, 2, 3, 6, 7],
-           [0, 1, 2, 3, 8, 9]])
+    array([[ 1,  2,  3,  4,  5,  6],
+           [ 1,  2,  3,  4,  7,  8],
+           [ 1,  2,  3,  4,  9, 10]])
     """
     # TODO: text の長さが違っていてもできるようにする
     # もしかしたら、np.arrayのpython.listでもよいのかもしれない

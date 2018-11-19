@@ -7,8 +7,21 @@ import json
 from pathlib import Path
 import pickle
 
+INPUT_FILE = 'data/names_gt_1000.tsv'
+TOKENIZED_FILE = '/tmp/tokenized_data'
+
+
+def tokenize(file_name=INPUT_FILE):
+    tokenized_lines = []
+    with open(file_name, 'r') as input_file:
+        tokenized_lines = [' '.join(list(line)) for line in input_file]
+    with open(TOKENIZED_FILE, 'w') as tokenized_file:
+        tokenized_file.writelines(tokenized_lines)
+
+
 def dump():
-    os.system("fasttext cbow -input data/names_has_uu.tsv -output model -minCount 2 -dim 300")
+    tokenize()
+    os.system(f"fasttext cbow -input {TOKENIZED_FILE} -output model -minCount 2 -dim 300")
     term_vec = {}
 
     with open('model.vec', 'r') as model_file:
