@@ -1,6 +1,24 @@
 # -*- coding: utf-8 -*-
 import re
 import numpy as np
+from typing import List
+import codecs
+
+
+def open_raw_data(input_file_path: str) -> List[str]:
+    with codecs.open(input_file_path, 'r', 'utf-8') as file:
+        return file.readlines()
+
+
+def append_EOS(texts: List[str], eos: str) -> List[str]:
+    """
+    Appends EOS to each text.
+    >>> texts = ["a\\n", "b\\n"]
+    >>> eos = "<EOS>"
+    >>> append_EOS(texts=texts, eos=eos)
+    ['a<EOS>', 'b<EOS>']
+    """
+    return [text.strip() + eos for text in texts]
 
 
 def preprocess(texts, puts_padding=False, padding_char="\t"):
@@ -169,6 +187,36 @@ def convert_one_hot(corpus, vocabulary_size, max_length):
         one_hot[idx, word_id] = 1
 
     return one_hot
+
+
+def train_data_to_train_and_target_vector(train_data):
+    """
+    Converts training data to training vectors (X) and target vectors (Y).
+    >>> train_data = np.array([[0, 1, 0], [0, 0, 1]])
+    >>> train_vectors, target_vectors = train_data_to_train_and_target_vector(train_data)
+    >>> train_vectors
+    [[array([0, 1])], [array([0, 0])]]
+    >>> train_vectors[0][0]
+    array([0, 1])
+    >>> target_vectors
+    [array([1, 0]), array([0, 1])]
+    """
+    train_vectors = [[vector[:-1]] for vector in train_data]
+    target_vectors = [vector[1:] for vector in train_data]
+    return train_vectors, target_vectors
+
+
+def char_to_one_hot(char: str, char_to_id, vocabulary_size):
+    """
+    Convert char to one hot vector.
+    >>> char = 'a'
+    >>> char_to_id = {'a': 1, 'b': 2}
+    >>> vocabulary_size = 5
+    >>> char_to_one_hot(char, char_to_id, vocabulary_size)
+    array([[0, 1, 0, 0, 0]], dtype=int32)
+    """
+    input_char_id = char_to_id[char]
+    return convert_one_hot(np.array([input_char_id]), vocabulary_size, max_length=1)
 
 
 def generate_npy(texts, char_to_id, output_file):
