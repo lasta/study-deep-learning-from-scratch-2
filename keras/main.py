@@ -55,50 +55,46 @@ def predict(input_vector, model):
     return  model.predict(np.array(input_vector))
 
 
-def main():
-    raw_data = open_raw_data(INPUT_FILE_PATH)
-    train_texts = append_EOS(raw_data, eos=EOS)
+# -- main --
+raw_data = open_raw_data(INPUT_FILE_PATH)
+train_texts = append_EOS(raw_data, eos=EOS)
 
-    corpus, char_to_id, id_to_char = preprocess(train_texts, padding_char=EOS)
-    vocabulary_size = len(char_to_id)
+corpus, char_to_id, id_to_char = preprocess(train_texts, padding_char=EOS)
+vocabulary_size = len(char_to_id)
 
-    combined_texts = reduce(add, train_texts)
-    max_length = len(combined_texts)
-    text_vectors = text_to_vec(combined_texts, char_to_id)
-    text_one_hot_vectors = convert_one_hot(text_vectors, vocabulary_size, max_length)
+combined_texts = reduce(add, train_texts)
+max_length = len(combined_texts)
+text_vectors = text_to_vec(combined_texts, char_to_id)
+text_one_hot_vectors = convert_one_hot(text_vectors, vocabulary_size, max_length)
 
-    """
-    train_vec -> target_vec
-    [0]: 東 -> 京
-    [1]: 京 -> タ
-    [2]: タ -> ワ
-    [3]: ワ -> ー
-    [4]: ー -> <EOS>
-    [5]: <EOS> -> 0 (padding)
-    [max_length + 1]: I -> K
-    [max_length + 2]: K -> E
-    [max_length + 3]: E -> A
-    [max_length + 4]: A -> 立
-    [max_length + 5]: 立 -> 川
-    [max_length + 6]: 川 -> <EOS>
-    [max_length + 7]: <EOS> -> 0 (padding)
-    """
-    train_vectors, target_vectors = train_data_to_train_and_target_vector(text_one_hot_vectors)
+"""
+train_vec -> target_vec
+[0]: 東 -> 京
+[1]: 京 -> タ
+[2]: タ -> ワ
+[3]: ワ -> ー
+[4]: ー -> <EOS>
+[5]: <EOS> -> 0 (padding)
+[max_length + 1]: I -> K
+[max_length + 2]: K -> E
+[max_length + 3]: E -> A
+[max_length + 4]: A -> 立
+[max_length + 5]: 立 -> 川
+[max_length + 6]: 川 -> <EOS>
+[max_length + 7]: <EOS> -> 0 (padding)
+"""
+train_vectors, target_vectors = train_data_to_train_and_target_vector(text_one_hot_vectors)
 
-    model = train(train_vectors, target_vectors)
+model = train(train_vectors, target_vectors)
 
-    # predict
-    input_char = 'I'
-    input_one_hot_vector = char_to_one_hot(input_char, char_to_id, vocabulary_size)
-    # reshape to input dim matrix
-    input_vector = np.array([[vector[1:]] for vector in input_one_hot_vector])
+# predict
+input_char = 'I'
+input_one_hot_vector = char_to_one_hot(input_char, char_to_id, vocabulary_size)
+# reshape to input dim matrix
+input_vector = np.array([[vector[1:]] for vector in input_one_hot_vector])
 
-    output_vector = predict(input_vector, model)
+output_vector = predict(input_vector, model)
 
-    max_idx = output_vector.argmax()
-    predicted_char = id_to_char[max_idx]
-    print("predicted : " + predicted_char)
-
-
-if __name__ == "__main__":
-    main()
+max_idx = output_vector.argmax()
+predicted_char = id_to_char[max_idx]
+print("predicted : " + predicted_char)
