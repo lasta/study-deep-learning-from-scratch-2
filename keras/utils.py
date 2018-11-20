@@ -2,12 +2,6 @@
 import re
 import numpy as np
 from typing import List
-import codecs
-
-
-def open_raw_data(input_file_path: str) -> List[str]:
-    with codecs.open(input_file_path, 'r', 'utf-8') as file:
-        return file.readlines()
 
 
 def append_EOS(texts: List[str], eos: str) -> List[str]:
@@ -114,29 +108,50 @@ def put_padding(text, max_length, filling_char="\t"):
     return text + filling_chars
 
 
-def text_to_vec(text, char_to_id):
+def text_to_vec(text, term_to_vec):
     """
-    TODO: fastText を用いた分散表現を用いる
     Converts text to vector in corpus.
     When char in text is not in corpus, then raises KeyError.
+    Facebook fastText processes terms are split with white space,
+    so ignore whitespace in text.
 
     :param text: text to vector
     :param char_to_id: dictionary of character to id
     :return: vector (dim 1 of numpy array)
     >>> text = "IKEA"
-    >>> char_to_id = {'I': 0, 'K': 1, 'E': 2, 'A': 3, '港': 4, '北': 5, '\\t': 6}
-    >>> text_to_vec(text, char_to_id)
-    array([0, 1, 2, 3])
+    >>> term_to_vec = {'I': np.array([0]), 'K': np.array([1]), 'E': np.array([2]), 'A': np.array([3]), '港': np.array([4]), '北': np.array([5]), '\\t': np.array([6])}
+    >>> text_to_vec(text, term_to_vec)
+    array([[0],
+           [1],
+           [2],
+           [3]])
 
     >>> text = "IKE!" # "!" is not in char_to_id.
-    >>> char_to_id = {'I': 0, 'K': 1, 'E': 2, 'A': 3, '港': 4, '北': 5, '\\t': 6}
-    >>> text_to_vec(text, char_to_id)
-    Traceback (most recent call last):
-        ...
-    KeyError: '!'
+    >>> term_to_vec = {'I': np.array([0]), 'K': np.array([1]), 'E': np.array([2]), 'A': np.array([3]), '港': np.array([4]), '北': np.array([5]), '\\t': np.array([6])}
+    >>> text_to_vec(text, term_to_vec)
+    array([[0],
+           [1],
+           [2],
+           [0]])
     """
-    chars = [char for char in list(text)]
-    return np.array([char_to_id[char] for char in chars])
+    chars = [char for char in list(text) if char != ' ']
+    return np.array([char_to_vec(char, term_to_vec) for char in chars])
+
+
+def char_to_vec(char, term_to_vec):
+    """
+    >>> char = 'a'
+    >>> term_to_vec = {'a': np.array([[0], [1]])}
+    >>> char_to_vec(char, term_to_vec)
+    array([[0],
+           [1]])
+
+    >>> char = ' '
+    >>> char_to_vec(char, term_to_vec)
+    array([[0],
+           [0]])
+    """
+    return term_to_vec.get(char, np.zeros_like(term_to_vec[list(term_to_vec)[0]]))
 
 
 def convert_one_hot(corpus, vocabulary_size, max_length):
