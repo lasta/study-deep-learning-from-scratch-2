@@ -1,4 +1,6 @@
 keras/data/
+colaboratory/data/
 *.bin
 *.vec
 *.pkl
+colaboratory/colab_preprocess.py
