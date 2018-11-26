@@ -116,7 +116,7 @@ def text_to_vec(text, term_to_vec):
            [2],
            [0]])
     """
-    chars = [char for char in list(text) if char != ' ']
+    chars = [char for char in list(text)]
     return np.array([char_to_vec(char, term_to_vec) for char in chars])
 
 
@@ -197,10 +197,10 @@ def train_data_to_train_and_target_vector(train_data):
     >>> train_vectors[0][0]
     array([0, 1, 0])
     >>> target_vectors
-    [array([0, 0, 1])]
+    array([[0, 0, 1]])
     """
     train_vectors = [[vector] for vector in train_data][:-1]
-    target_vectors = [vector for vector in train_data][1:]
+    target_vectors = train_data[1:]
     return train_vectors, target_vectors
 
 
@@ -310,11 +310,11 @@ def max_cos_sim(vec, mat):
     :return: vector of max of cosine similarity im :mat:
 
     >>> vec = np.array([1, 1, 1, 1])
-    >>> mat = [np.array([1, 1, 1, 1]), np.array([-1, -1, -1, -1])]
+    >>> mat = np.array([[1, 1, 1, 1], [-1, -1, -1, -1]])
     >>> max_cos_sim(vec, mat)
     array([1, 1, 1, 1])
     """
-    return max(mat, key=lambda col: cos_sim(col, vec))
+    return max(list(mat), key=lambda col: cos_sim(col, vec))
 
 
 def find_nearest(arr, val):
@@ -337,10 +337,10 @@ def find_char_by_vec(vec: np.ndarray, term_vec: Dict[str, List[float]]) -> str:
     'b'
     >>> vec_not_in_term_vec = np.array([0, 0, -1])
     >>> find_char_by_vec(vec_not_in_term_vec, term_vec)
+    'Not Found'
     """
     chars = [key for key, value in term_vec.items() if value == vec.tolist()]
-    if chars:
-        return chars[0]
+    return next(iter(chars), 'Not Found')
 
 
 def fill_with_eos(text, length, eos):
